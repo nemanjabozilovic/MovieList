@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MovieList</string>
+    <string name="movie_title">Movie Title</string>
+    <string name="genre">Genre</string>
+    <string name="year">Year</string>
+    <string name="rating">Rating</string>
+    <string name="delete">Delete</string>
+</resources>
