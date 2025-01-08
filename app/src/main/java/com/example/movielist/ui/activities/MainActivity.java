@@ -1,12 +1,20 @@
 package com.example.movielist.ui.activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.movielist.R;
 import com.example.movielist.data.models.Movie;
 import com.example.movielist.ui.adapters.MovieAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,15 +32,14 @@ public class MainActivity extends AppCompatActivity {
 
         movieList = getMovieList();
 
-        movieAdapter = new MovieAdapter(movieList, new MovieAdapter.OnMovieDeleteListener() {
-            @Override
-            public void onMovieDelete(Movie movie) {
-                movieList.remove(movie);
-                movieAdapter.notifyDataSetChanged();
-            }
+        movieAdapter = new MovieAdapter(movieList, movie -> {
+            movieList.remove(movie);
+            movieAdapter.notifyDataSetChanged();
         });
 
         recyclerView.setAdapter(movieAdapter);
+
+        findViewById(R.id.addMovieButton).setOnClickListener(v -> showAddMovieDialog());
     }
 
     private List<Movie> getMovieList() {
@@ -55,5 +62,58 @@ public class MainActivity extends AppCompatActivity {
     private void initializeUIElements() {
         recyclerView = findViewById(R.id.movieListContainer);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void showAddMovieDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add a New Movie");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(16, 16, 16, 16);
+
+        final EditText titleInput = new EditText(this);
+        titleInput.setHint("Movie Title");
+        layout.addView(titleInput);
+
+        final EditText genreInput = new EditText(this);
+        genreInput.setHint("Genre");
+        layout.addView(genreInput);
+
+        final EditText yearInput = new EditText(this);
+        yearInput.setHint("Year");
+        yearInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        layout.addView(yearInput);
+
+        final EditText ratingInput = new EditText(this);
+        ratingInput.setHint("Rating (0.0 - 10.0)");
+        ratingInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView(ratingInput);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String title = titleInput.getText().toString().trim();
+            String genre = genreInput.getText().toString().trim();
+            String yearString = yearInput.getText().toString().trim();
+            String ratingString = ratingInput.getText().toString().trim();
+
+            if (title.isEmpty() || genre.isEmpty() || yearString.isEmpty() || ratingString.isEmpty()) {
+                Toast.makeText(this, "All fields must be filled out!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int year = Integer.parseInt(yearString);
+            double rating = Double.parseDouble(ratingString);
+
+            movieList.add(new Movie(title, genre, year, rating));
+            movieAdapter.notifyDataSetChanged();
+
+            Toast.makeText(this, "Movie added successfully!", Toast.LENGTH_SHORT).show();
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 }

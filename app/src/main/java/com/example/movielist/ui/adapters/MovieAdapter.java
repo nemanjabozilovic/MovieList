@@ -12,8 +12,8 @@ import com.example.movielist.data.models.Movie;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
-    private List<Movie> movieList;
-    private OnMovieDeleteListener listener;
+    private final List<Movie> movieList;
+    private final OnMovieDeleteListener listener;
 
     public MovieAdapter(List<Movie> movieList, OnMovieDeleteListener listener) {
         this.movieList = movieList;
